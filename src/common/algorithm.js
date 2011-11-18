@@ -336,7 +336,7 @@ var algorithm = function(options) {
   };
   
   this.perlin2 = function(x,y) { 
-    return 0.0; 
+    return _perlinNoise.noise(x,y,0); 
   };
   
   this.perlin3 = function(x,y,z) { 
