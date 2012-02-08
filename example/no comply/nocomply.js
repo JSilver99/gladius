@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
     const LEFT_BORDER = 40;
     const RIGHT_BORDER = 19;
     const MOVE_SPEED = 0.2;
+    const FLOOR_POS = 8;
     //const JUMP_HEIGHT
 
     var keyStates = [];
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         }
         
         this.update = function(t){
-          // update sprite randomly?
+          pl.speed[0] = 0;
         };
         
         this.toString = function(){
@@ -355,13 +356,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         this.spin = function(){pl.setState(pl.getSpinState());};
         
         this.update = function(t, pc){
-            var pos = pc.position;
-          // near the boxes of the abandoned house
-          if( pos[2] > RIGHT_BORDER){
-
-            pos[2] -= MOVE_SPEED;
-            pc.position = pos;
-          }
+          pl.speed[0] = MOVE_SPEED;
         };
 
         this.toString = function(){
@@ -402,12 +397,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         }
 
         this.update = function(t, pc){
-          var pos = pc.position;
-          
-          if(pos[2] < LEFT_BORDER ){
-            pos[2] += MOVE_SPEED;
-            pc.position = pos;
-          }
+          pl.speed[0] = -MOVE_SPEED;
         };
 
         this.toString = function(){
@@ -483,29 +473,14 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
       this.dead = function(){pl.setState(pl.getDeadState());};
       
+      this.onActivate = function() {
+        pl.speed[1] = MOVE_SPEED * 15;
+      };
+      
       this.update = function(t, pc){
         jumpTimeElapsed += t;
-        
-        if(jumpTimeElapsed < 1){
-          pos = pc.position;
-          pos[1] += Math.sin(jumpTimeElapsed * Math.PI * 2) * 1.013;        
-          pc.position = pos;
-        }
-        
-       if(jumpTimeElapsed >= 1){
-         // !!! fix this
-         pos[1] = 8;
-         pc.position[1] = 8;
-         console.log(pc.position);
-
+        if (pc.position[1] === FLOOR_POS && jumpTimeElapsed >= 1)
          pl.setState(pl.getIdleState());
-         jumpTimeElapsed = 0;
-        
-          /// fix this.
-          // Let's say the user moves forward, jumps then lets go of moving
-          // forward key. They still need to move forward until they land
-          //  player.removeState(player.getMoveForwardState());
-        }
       };
 
       this.toString = function(){
@@ -543,38 +518,14 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
       this.dead = function(){pl.setState(pl.getDeadState());};
       
+      this.onActivate = function() {
+        pl.speed[1] = MOVE_SPEED * 15;
+      };
+      
       this.update = function(t, pc){
         jumpTimeElapsed += t;
-        
-        
-        // !!! Fix this
-        if(jumpTimeElapsed < 1){
-          pos = pc.position;
-          pos[1] += Math.sin(jumpTimeElapsed * Math.PI * 2) * 1.013;        
-
-          // Fix this !!!
-          if(pos[2] > RIGHT_BORDER){
-            pos[2] -= MOVE_SPEED;
-            pc.position = pos;
-          }
-
-          pc.position = pos;
-        }
-        
-       if(jumpTimeElapsed >= 1){
-         // !!! fix this
-         pos[1] = 8;
-         pc.position[1] = 8;
-         console.log(pc.position);
-
+        if (pc.position[1] === FLOOR_POS && jumpTimeElapsed >= 1)
          pl.setState(pl.getIdleState());
-         jumpTimeElapsed = 0;
-        
-          /// fix this.
-          // Let's say the user moves forward, jumps then lets go of moving
-          // forward key. They still need to move forward until they land
-          //  player.removeState(player.getMoveForwardState());
-        }
       };
 
       this.toString = function(){
@@ -611,36 +562,14 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
       this.dead = function(){pl.setState(pl.getDeadState());};
       
+      this.onActivate = function() {
+        pl.speed[1] = MOVE_SPEED * 15;
+      };
+      
       this.update = function(t, pc){
         jumpTimeElapsed += t;
-        var pos = pc.position;
-                  
-        if(jumpTimeElapsed < 1){
-          pos[1] += Math.sin(jumpTimeElapsed * Math.PI * 2) * 1.013;
-          
-          // Fix this !!!
-          if(pos[2] < LEFT_BORDER){
-            pos[2] += MOVE_SPEED;
-            pc.position = pos;
-          }
-          
-          pc.position = pos;
-        }
-        
-       if(jumpTimeElapsed >= 1){
-         // !!! fix this
-         pos[1] = 8;
-         pc.position[1] = 8;
-         console.log(pc.position);
-
+        if (pc.position[1] === FLOOR_POS && jumpTimeElapsed >= 1)
          pl.setState(pl.getIdleState());
-         jumpTimeElapsed = 0;
-        
-          /// fix this.
-          // Let's say the user moves forward, jumps then lets go of moving
-          // forward key. They still need to move forward until they land
-          //  player.removeState(player.getMoveForwardState());
-        }
       };
 
       this.toString = function(){
@@ -677,6 +606,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
       var forwardJumpState = new ForwardJumpState(this);
       var backwardJumpState = new BackwardJumpState(this);
 
+      this.speed = [ 0, 0 ];
       
       // start in an idle state.
       state = idleState;
@@ -735,13 +665,31 @@ document.addEventListener("DOMContentLoaded", function (e) {
       
       this.setState = function(s){
         state = s;
+        if (s.onActivate) s.onActivate();
         console.log('state changed: ' + s.toString());
       };
       
       this.update = function(t, pc){
         state.update(t, pc);
+        var pos = pc.position;
+        this.speed[1] -= 0.98;
+        pos[1] += this.speed[1];
+        pos[2] -= this.speed[0];
+        this.stayInBounds(pos);
+        pc.position = pos;
         printd('debug', this.toString());
         //"Health: " + this.getHealth() + " , " + state.toString()
+      }
+      
+      this.stayInBounds = function(pos) {
+        if(pos[2] > LEFT_BORDER )
+          pos[2] = LEFT_BORDER;
+        if(pos[2] < RIGHT_BORDER )
+          pos[2] = RIGHT_BORDER;
+        if (pos[1] <= FLOOR_POS) {
+          pos[1] = FLOOR_POS;
+          this.speed[1] = 0;
+        }
       }
       
       // smack the player with something
