@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
     const LEFT_BORDER = 40;
     const RIGHT_BORDER = 19;
-    const MOVE_SPEED = 0.2;
+    const MOVE_SPEED = 0.5;
     const FLOOR_POS = 8;
     //const JUMP_HEIGHT
 
@@ -474,7 +474,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.dead = function(){pl.setState(pl.getDeadState());};
       
       this.onActivate = function() {
-        pl.speed[1] = MOVE_SPEED * 15;
+        if (pl.speed[1] === 0)
+          pl.speed[1] = MOVE_SPEED * 7;
       };
       
       this.update = function(t, pc){
@@ -519,7 +520,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.dead = function(){pl.setState(pl.getDeadState());};
       
       this.onActivate = function() {
-        pl.speed[1] = MOVE_SPEED * 15;
+        if (pl.speed[1] === 0)
+          pl.speed[1] = MOVE_SPEED * 7;
       };
       
       this.update = function(t, pc){
@@ -563,7 +565,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.dead = function(){pl.setState(pl.getDeadState());};
       
       this.onActivate = function() {
-        pl.speed[1] = MOVE_SPEED * 15;
+        if (pl.speed[1] === 0)
+          pl.speed[1] = MOVE_SPEED * 7;
       };
       
       this.update = function(t, pc){
