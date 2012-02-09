@@ -4,9 +4,10 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
     const LEFT_BORDER = 40;
     const RIGHT_BORDER = 19;
-    const MOVE_SPEED = 0.5;
+    const MOVE_SPEED = 15;
     const FLOOR_POS = 8;
-    //const JUMP_HEIGHT
+    const JUMP_HEIGHT = 35;
+    const GRAVITY = 0.98;
 
     var keyStates = [];
 
@@ -41,7 +42,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
         }
         
         this.update = function(t){
-          pl.speed[0] = 0;
+          if (pl.speed[1] === 0)
+            pl.speed[0] = 0;
         };
         
         this.toString = function(){
@@ -475,7 +477,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
       
       this.onActivate = function() {
         if (pl.speed[1] === 0)
-          pl.speed[1] = MOVE_SPEED * 7;
+          pl.speed[1] = JUMP_HEIGHT;
       };
       
       this.update = function(t, pc){
@@ -521,7 +523,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
       
       this.onActivate = function() {
         if (pl.speed[1] === 0)
-          pl.speed[1] = MOVE_SPEED * 7;
+          pl.speed[1] = JUMP_HEIGHT;
       };
       
       this.update = function(t, pc){
@@ -566,7 +568,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
       
       this.onActivate = function() {
         if (pl.speed[1] === 0)
-          pl.speed[1] = MOVE_SPEED * 7;
+          pl.speed[1] = JUMP_HEIGHT;
       };
       
       this.update = function(t, pc){
@@ -675,9 +677,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.update = function(t, pc){
         state.update(t, pc);
         var pos = pc.position;
-        this.speed[1] -= 0.98;
-        pos[1] += this.speed[1];
-        pos[2] -= this.speed[0];
+        this.speed[1] -= GRAVITY * 100 * t;
+        pos[1] += this.speed[1] * t;
+        pos[2] -= this.speed[0] * t;
         this.stayInBounds(pos);
         pc.position = pos;
         printd('debug', this.toString());
