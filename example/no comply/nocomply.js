@@ -771,7 +771,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
         try {
           var context = engine.graphics.target.context;
-          var scene = context.loadCollada(url, "city");
+          var scene = CubicVRLoader.loadScene(url, "city");
           onsuccess(scene);
         } catch (e) {
           onfailure(e);
@@ -1011,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
       engine.core.resource.get([{
         type: engine.core.resource.Collada,
-        url: "city/intro_city-anim.dae",
+        url: "city/intro_city-anim.json",
         load: colladaLoader,
         onsuccess: function (instance) {
           space = instance.space;
