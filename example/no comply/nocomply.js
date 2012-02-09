@@ -879,9 +879,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
                   material: resources.material
                 })
                 ]
-                });
-                        
-                      
+                });                     
                       
             new space.Entity({
               name: 'player',
